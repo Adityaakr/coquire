@@ -143,7 +143,7 @@
 .fx-ba[data-side=after] .fx-ba-knob img{transform:rotate(180deg)}
 .fx-ba-overlay-top{position:absolute;left:25%;right:25%;top:0;height:45px;background:linear-gradient(180deg,#fff,rgba(255,255,255,0));z-index:2;pointer-events:none}
 .fx-ba-frame{border:1px solid var(--fx-mist);border-radius:30px;padding:6px;position:relative}
-.fx-ba-panel{--band:200px;background:var(--fx-lgb);border-radius:24px;padding:142px 30px calc(var(--band) + 24px);display:grid;grid-template-columns:1fr .6fr;gap:30px;align-items:start;min-height:465px;position:relative;overflow:hidden;transition:background var(--dur-3) var(--ease-out)}
+.fx-ba-panel{--band:200px;background:var(--fx-lgb);border-radius:24px;padding:142px 30px 0;display:grid;grid-template-columns:1fr .6fr;gap:30px;align-items:start;min-height:465px;position:relative;overflow:hidden;transition:background var(--dur-3) var(--ease-out)}
 .fx-ba[data-side=after] .fx-ba-panel{background:#000}
 .fx-ba-panel h3{font-size:32px;letter-spacing:-1px;color:var(--fx-jet);transition:color var(--dur-3) var(--ease-out)}
 .fx-ba[data-side=after] .fx-ba-panel h3{color:#fff}
@@ -156,7 +156,7 @@
 .fx-ba[data-side=after] .fx-ba-statcard b{color:#fff}
 .fx-ba-statcard span{font-size:16px;color:var(--fx-slate)}
 .fx-ba[data-side=after] .fx-ba-statcard span{color:rgba(221,229,237,.7)}
-.fx-ba-bg{position:absolute;left:0;right:0;bottom:0;height:var(--band);z-index:0;opacity:0;transition:opacity var(--dur-3) var(--ease-out);pointer-events:none}
+.fx-ba-bg{position:relative;grid-column:1 / -1;height:var(--band);margin:24px -30px 0;opacity:0;transition:opacity var(--dur-3) var(--ease-out);pointer-events:none;overflow:hidden}
 .fx-ba-bg img{width:100%;height:100%;object-fit:cover}
 .fx-ba-bg::before{content:'';position:absolute;left:0;right:0;top:0;height:70%;background:linear-gradient(180deg,#000 0%,rgba(0,0,0,.85) 40%,rgba(0,0,0,0) 100%);z-index:1}
 .fx-ba[data-side=after] .fx-ba-bg{opacity:1}
@@ -505,7 +505,8 @@
   .fx-compare{gap:60px}
   .fx-compare-wrap{position:relative;top:auto}
   .fx-compare-spacer{display:none}
-  .fx-ba-panel{--band:160px;grid-template-columns:1fr;padding:110px 20px calc(var(--band) + 24px);min-height:0}
+  .fx-ba-panel{--band:160px;grid-template-columns:1fr;padding:110px 20px 0;min-height:0}
+  .fx-ba-bg{margin:20px -20px 0}
   .fx-ba-tab{font-size:14px;padding:0 8px 16px}
   .fx-ba-knob{flex-basis:90px;width:90px}
   .fx-ba-knob img{width:90px;top:0}
