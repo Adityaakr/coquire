@@ -142,7 +142,8 @@
 .ap-pipe-step[data-hot=true] .ap-pipe-n{color:var(--fx-indigo)}
 
 /* table polish */
-.ap-table{min-width:760px}
+.ap-table{min-width:640px}
+.ap-row td:last-child{white-space:nowrap}
 .ap-row td{padding:14px 20px;vertical-align:middle}
 .ap-th{padding:10px 20px}
 .ap-prog{display:flex;align-items:center;gap:10px;min-width:150px}
