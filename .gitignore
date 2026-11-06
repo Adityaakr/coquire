@@ -27,10 +27,11 @@ dist-ssr
 .env
 .env.local
 
-# Hardhat
+# Build caches
 cache
-artifacts
-typechain-types
 
 # Lock files (bun)
 bun.lock
+
+# runtime data (sqlite, tessdata cache)
+data/

@@ -1,55 +1,53 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { Toaster } from "@/components/ui/toaster";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { WalletProvider } from "@/contexts/WalletContext";
-import Index from "./pages/Index.tsx";
-import NotFound from "./pages/NotFound.tsx";
-import AppLayout from "./components/AppLayout.tsx";
-import AppOverview from "./pages/app/AppOverview.tsx";
-import VaultsPage from "./pages/app/VaultsPage.tsx";
-import VaultDetailPage from "./pages/app/VaultDetailPage.tsx";
-import AgentsPage from "./pages/app/AgentsPage.tsx";
-import AgentDetailPage from "./pages/app/AgentDetailPage.tsx";
-import AgentChatPage from "./pages/app/AgentChatPage.tsx";
-import ArenaPage from "./pages/app/ArenaPage.tsx";
-import LeaderboardPage from "./pages/app/LeaderboardPage.tsx";
-import ActivityPage from "./pages/app/ActivityPage.tsx";
-import PortfolioPage from "./pages/app/PortfolioPage.tsx";
-import SettingsPage from "./pages/app/SettingsPage.tsx";
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { WalletProvider } from '@/contexts/WalletContext';
+import { StoreProvider } from '@/store/store';
+import { LandingPage } from '@/landing/LandingPage';
+import { ProductPage } from '@/landing/ProductPage';
+import { DocsPage } from '@/docs/DocsPage';
+import { UseCasesPage } from '@/landing/UseCasesPage';
+import { AppLayout } from '@/app/AppLayout';
+import { OnboardPage } from '@/app/OnboardPage';
+import { OverviewPage } from '@/app/OverviewPage';
+import { NewOrderPage } from '@/app/NewOrderPage';
+import { OrderPage } from '@/app/OrderPage';
+import { DiscoverPage } from '@/app/DiscoverPage';
+import { SettingsPage } from '@/app/SettingsPage';
 
-const queryClient = new QueryClient();
+function NotFound() {
+  return (
+    <div style={{ minHeight: '100vh', display: 'grid', placeItems: 'center', textAlign: 'center', padding: 24 }}>
+      <div>
+        <div className="eyebrow" style={{ color: 'var(--fx-indigo)', marginBottom: 12 }}>404</div>
+        <h1 style={{ fontSize: 40, fontWeight: 600 }}>Nothing here.</h1>
+        <p style={{ color: 'var(--text-2)', marginTop: 10 }}><a href="/">Back to Coquire</a></p>
+      </div>
+    </div>
+  );
+}
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
+export default function App() {
+  return (
     <WalletProvider>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/app" element={<AppLayout />}>
-            <Route index element={<AppOverview />} />
-            <Route path="overview" element={<AppOverview />} />
-            <Route path="vaults" element={<VaultsPage />} />
-            <Route path="vaults/:id" element={<VaultDetailPage />} />
-            <Route path="agents" element={<AgentsPage />} />
-            <Route path="agents/:id" element={<AgentDetailPage />} />
-            <Route path="agents/:id/chat" element={<AgentChatPage />} />
-            <Route path="arena" element={<ArenaPage />} />
-            <Route path="leaderboard" element={<LeaderboardPage />} />
-            <Route path="activity" element={<ActivityPage />} />
-            <Route path="portfolio" element={<PortfolioPage />} />
-            <Route path="settings" element={<SettingsPage />} />
-          </Route>
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
+      <StoreProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/product" element={<ProductPage />} />
+            <Route path="/use-cases" element={<UseCasesPage />} />
+            <Route path="/docs" element={<DocsPage />} />
+            <Route path="/docs/:slug" element={<DocsPage />} />
+            <Route path="/app" element={<AppLayout />}>
+              <Route index element={<OverviewPage />} />
+              <Route path="onboard" element={<OnboardPage />} />
+              <Route path="orders/new" element={<NewOrderPage />} />
+              <Route path="orders/:id" element={<OrderPage />} />
+              <Route path="discover" element={<DiscoverPage />} />
+              <Route path="settings" element={<SettingsPage />} />
+            </Route>
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </StoreProvider>
     </WalletProvider>
-  </QueryClientProvider>
-);
-
-export default App;
+  );
+}

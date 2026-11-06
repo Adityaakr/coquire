@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, useRef, type ReactNode } from 'react';
 import { ethers } from 'ethers';
 import { connectMetaMask } from '@/lib/wallet';
 import { HEDERA_TESTNET } from '@/config/hedera';
@@ -13,6 +13,7 @@ interface WalletState {
   isConnecting: boolean;
   connect: () => Promise<void>;
   disconnect: () => void;
+  getSigner: () => Promise<ethers.JsonRpcSigner | null>;
 }
 
 const WalletContext = createContext<WalletState>({
@@ -25,6 +26,7 @@ const WalletContext = createContext<WalletState>({
   isConnecting: false,
   connect: async () => {},
   disconnect: () => {},
+  getSigner: async () => null,
 });
 
 export function useWallet() {
@@ -56,6 +58,15 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  const signerRef = useRef<ethers.JsonRpcSigner | null>(null);
+  useEffect(() => { signerRef.current = signer; }, [signer]);
+  const getSigner = useCallback(async () => {
+    if (signerRef.current) return signerRef.current;
+    const result = await connectMetaMask();
+    setProvider(result.provider); setSigner(result.signer); setAddress(result.address); setChainId(result.chainId);
+    return result.signer;
+  }, []);
+
   const disconnect = useCallback(() => {
     setAddress(null);
     setChainId(null);
@@ -66,7 +77,8 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!window.ethereum) return;
 
-    const handleAccountsChanged = (accounts: string[]) => {
+    const handleAccountsChanged = (...args: never[]) => {
+      const accounts = args[0] as unknown as string[];
       if (accounts.length === 0) {
         disconnect();
       } else {
@@ -74,7 +86,8 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       }
     };
 
-    const handleChainChanged = (newChainId: string) => {
+    const handleChainChanged = (...args: never[]) => {
+      const newChainId = args[0] as unknown as string;
       setChainId(parseInt(newChainId, 16));
       if (address) {
         connect();
@@ -92,7 +105,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
 
   return (
     <WalletContext.Provider value={{
-      address, isConnected, chainId, provider, signer, isCorrectNetwork, isConnecting, connect, disconnect,
+      address, isConnected, chainId, provider, signer, isCorrectNetwork, isConnecting, connect, disconnect, getSigner,
     }}>
       {children}
     </WalletContext.Provider>
