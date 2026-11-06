@@ -1,0 +1,10 @@
+{
+  "run": "2026-11-06-coquire-v1",
+  "phase": "complete",
+  "archetype": "BUILD",
+  "branch": "feat/coquire-v1",
+  "outputs": ["docs/01-coquire-build.md", ".prism/project-model.md"],
+  "verification": {"tsc": "pass", "vitest": "10/10", "vite build": "pass", "eslint": "clean", "e2e": "buyer+supplier flows pass, 0 console errors"},
+  "open_items": ["headline soften decision", "live x402 facilitator wiring", "funding demo accounts"],
+  "claims": {"hedera-rpc": "verified", "ethers-v6": "verified", "pricing-reconciles": "verified", "e2e-flow": "verified", "x402-exact-scheme": "supported", "facilitators": "supported", "ccip-lane": "supported", "arkiv-expiry": "supported"}
+}
