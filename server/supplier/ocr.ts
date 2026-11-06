@@ -23,7 +23,7 @@ export async function toPageImages(bytes: Uint8Array, mime: string): Promise<Uin
 
 const MONEY = /(?:total|amount due|balance due|grand total)[^\d]{0,24}([\d.,]+)/i;
 const INVOICE_NO = /(?:invoice|inv)\.?\s*(?:no|number|#)?[:\s#]*([A-Z0-9-]{3,})/i;
-const DATE = /(\d{4}-\d{2}-\d{2}|\d{1,2}[\/.-]\d{1,2}[\/.-]\d{2,4}|\d{1,2}\s+[A-Z][a-z]{2,8}\s+\d{4})/;
+const DATE = /(\d{4}-\d{2}-\d{2}|\d{1,2}[/.-]\d{1,2}[/.-]\d{2,4}|\d{1,2}\s+[A-Z][a-z]{2,8}\s+\d{4})/;
 const CURRENCY = /(USD|EUR|GBP|INR|\$|€|£)/;
 
 /** Real OCR with tesseract.js, then light extraction of the fields buyers asked for. Confidence is tesseract's own mean. */
