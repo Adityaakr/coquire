@@ -69,3 +69,31 @@ export function Note({ children, style }: { children: ReactNode; style?: CSSProp
 }
 
 export const Th = ({ children }: { children: ReactNode }) => <th className="ap-th">{children}</th>;
+
+/** Deterministic avatar colour from an address or name. */
+export function avatarColor(seed: string): string {
+  let h = 0;
+  for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) >>> 0;
+  const hue = h % 360;
+  return `linear-gradient(135deg, hsl(${hue} 70% 52%), hsl(${(hue + 40) % 360} 70% 42%))`;
+}
+
+export function TeamAvatar({ name, seed, size = 22 }: { name: string; seed?: string; size?: number }) {
+  return <span className="ap-team-av" style={{ width: size, height: size, background: avatarColor(seed ?? name), fontSize: Math.max(9, size * 0.45) }}>{name[0]?.toUpperCase()}</span>;
+}
+
+export function Progress({ done, total }: { done: number; total: number }) {
+  const pct = total > 0 ? Math.min(100, Math.round((done / total) * 100)) : 0;
+  return <div className="ap-prog"><span><i style={{ width: `${pct}%` }} /></span><b>{done}/{total}</b></div>;
+}
+
+export function Kpi({ label, value, sub, icon, bar, tone, mono }: { label: string; value: ReactNode; sub?: ReactNode; icon?: ReactNode; bar?: number; tone?: 'primary' | 'dark'; mono?: boolean }) {
+  return (
+    <div className={`ap-kpi${tone ? ` ap-kpi-${tone}` : ''}`}>
+      <div className="ap-kpi-h"><span className="ap-kpi-l">{label}</span>{icon && <span className="ap-kpi-ic">{icon}</span>}</div>
+      <div className={`ap-kpi-v${mono ? ' mono' : ''}`}>{value}</div>
+      {sub && <div className="ap-kpi-s">{sub}</div>}
+      {bar !== undefined && <div className="ap-kpi-bar"><i style={{ width: `${Math.min(100, Math.max(0, bar))}%` }} /></div>}
+    </div>
+  );
+}

@@ -51,6 +51,7 @@ export function OrderPage() {
           </div>
           <Link to="/app" style={{ fontSize: 13, color: 'var(--text-2)' }}>← Overview</Link>
         </div>
+        <Stepper status={status} />
         <div className="ap-grid-4" style={{ margin: '22px 0 4px' }}>
           <Stat label="Combined volume" value={`${totalCalls(order)} pages`} size="sm" sub={`${order.teams.length} ${order.teams.length === 1 ? 'team' : 'teams'} · 1 call = 1 page`} />
           <Stat label="Quotes" value={order.quotes.length} size="sm" sub={best !== null ? <>best <Money value={best} /> per page</> : 'suppliers are reviewing'} />
@@ -64,6 +65,23 @@ export function OrderPage() {
       {tab === 'quotes' && <QuotesTab order={order} isMember={isMember} />}
       {tab === 'execution' && <ExecutionTab order={order} isMember={isMember} />}
       {tab === 'earnings' && <EarningsTab order={order} />}
+    </div>
+  );
+}
+
+function Stepper({ status }: { status: ReturnType<typeof orderStatus> }) {
+  const order = ['open', 'approved', 'active', 'completed'] as const;
+  const labels = ['Listed, quotes open', 'Group approved', 'Agents paying', 'Completed'];
+  const idx = status === 'quoted' ? 0 : status === 'expired' ? -1 : order.indexOf(status as (typeof order)[number]);
+  return (
+    <div className="ap-stepper" style={{ margin: '22px 0 6px' }}>
+      {order.map((k, i) => (
+        <div key={k} className="ap-step" data-state={i < idx ? 'done' : i === idx ? 'now' : 'todo'}>
+          <span className="ap-step-dot">{i < idx ? '✓' : i + 1}</span>
+          <span className="ap-step-l">{labels[i]}</span>
+          {i < order.length - 1 && <span className="ap-step-line" />}
+        </div>
+      ))}
     </div>
   );
 }

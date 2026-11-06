@@ -1,88 +1,144 @@
-import { useEffect, useState } from 'react';
-import { Link, Navigate, NavLink, Outlet, useLocation } from 'react-router-dom';
-import { ArrowLeft, BookOpen, LayoutGrid, Plus, Search, Settings } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Link, Navigate, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { ArrowLeft, Bell, BookOpen, LayoutGrid, LogOut, Plus, Search, Settings, ShoppingBag, Store } from 'lucide-react';
 import './app.css';
 import { Badge, Bento, Button, Tabs, Toast } from '@/ui';
 import { useStore } from '@/store/store';
 import { useWallet } from '@/contexts/WalletContext';
 import { HEDERA_TESTNET } from '@/config/hedera';
 import { Wordmark } from '@/landing/Nav';
-import { shortAddr } from './kit';
+import { orderStatus } from '@/domain/selectors';
+import { avatarColor, shortAddr } from './kit';
 import type { Role } from '@/domain/types';
 
-const TITLES: Record<string, string> = { '/app': 'Overview', '/app/orders/new': 'New order', '/app/discover': 'Open orders', '/app/settings': 'Settings', '/app/onboard': 'Set up' };
-const titleFor = (path: string) => TITLES[path] ?? (path.startsWith('/app/orders/') ? 'Order' : 'Coquire');
+const TITLES: Record<string, [string, string]> = {
+  '/app': ['Overview', 'Orders, budgets and what to do next'],
+  '/app/orders/new': ['New order', 'Describe the workload and commit your pages'],
+  '/app/discover': ['Open orders', 'Funded group orders any supplier can quote'],
+  '/app/settings': ['Settings', 'Account, keys and what is live'],
+  '/app/onboard': ['Set up', 'One account, two modes'],
+};
+const titleFor = (path: string): [string, string] => TITLES[path] ?? (path.startsWith('/app/orders/') ? ['Order', 'Group, quotes and execution'] : ['Coquire', '']);
 
-function NetworkCard() {
-  const { me, ownerAddress, usingWallet } = useStore();
-  const live = me?.facilitator.live;
+function Workspace() {
+  const { role, myTeam, mySupplier, ownerAddress } = useStore();
+  const name = role === 'supplier' ? mySupplier?.name ?? 'Supplier' : myTeam?.name ?? 'Team';
   return (
-    <Bento variant="app" pad={14}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12.5, color: 'var(--text-1)', fontWeight: 500 }}>
-        {HEDERA_TESTNET.name}
-        <Badge size="sm" tone={live ? 'ok' : 'warn'} style={{ marginLeft: 'auto' }}>{live ? 'x402 live' : 'settlement simulated'}</Badge>
+    <div className="ap-ws" title={ownerAddress ?? ''}>
+      <span className="ap-ws-av" style={{ background: avatarColor(ownerAddress ?? name) }}>{name[0]?.toUpperCase()}</span>
+      <div style={{ minWidth: 0 }}>
+        <div className="ap-ws-t">{name}</div>
+        <div className="ap-ws-s">{role === 'supplier' ? 'Supplier workspace' : 'Buyer workspace'} · {ownerAddress ? shortAddr(ownerAddress) : '—'}</div>
       </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 4, fontFamily: 'var(--font-mono)', fontSize: 10.5, color: 'var(--text-3)', marginTop: 10 }}>
-        <span>{usingWallet ? 'wallet' : 'browser key'} {ownerAddress ? shortAddr(ownerAddress) : '—'}</span>
-        <span>arkiv {me?.arkiv.live ? 'rabdi testnet' : 'local index'} · ccip {me?.ccip.simulated ? 'simulated' : 'sepolia → hedera'}</span>
-      </div>
-    </Bento>
+    </div>
+  );
+}
+
+function StatusCard() {
+  const { me, usingWallet } = useStore();
+  return (
+    <div className="ap-status">
+      <div className="ap-status-row"><span className="ap-dot" data-on="true" /><b>{HEDERA_TESTNET.name}</b><span style={{ marginLeft: 'auto', fontFamily: 'var(--font-mono)', fontSize: 11 }}>{usingWallet ? 'wallet' : 'browser key'}</span></div>
+      <div className="ap-status-row"><span className="ap-dot" data-on={me?.facilitator.live ? 'true' : 'sim'} />x402 settlement<span style={{ marginLeft: 'auto', fontSize: 11.5, color: 'var(--text-3)' }}>{me?.facilitator.live ? 'live' : 'simulated'}</span></div>
+      <div className="ap-status-row"><span className="ap-dot" data-on={me?.arkiv.live ? 'true' : 'sim'} />Arkiv index<span style={{ marginLeft: 'auto', fontSize: 11.5, color: 'var(--text-3)' }}>{me?.arkiv.live ? 'Rabdi' : 'local'}</span></div>
+      <div className="ap-status-row"><span className="ap-dot" data-on={me?.ccip.simulated ? 'sim' : 'true'} />CCIP approval<span style={{ marginLeft: 'auto', fontSize: 11.5, color: 'var(--text-3)' }}>{me?.ccip.simulated ? 'simulated' : 'live'}</span></div>
+    </div>
   );
 }
 
 function useNav() {
-  const { role } = useStore();
-  const base = [
-    { to: '/app', label: 'Overview', icon: LayoutGrid, end: true },
-    { to: '/app/orders/new', label: 'New order', icon: Plus },
-    { to: '/app/discover', label: 'Open orders', icon: Search },
-    { to: '/app/settings', label: 'Settings', icon: Settings },
+  const { role, state, myTeam, mySupplier } = useStore();
+  const mine = state.orders.filter((o) => (role === 'supplier' ? o.quotes.some((q) => q.supplierId === mySupplier?.id) : o.teams.some((t) => t.teamId === myTeam?.id)));
+  const open = state.orders.filter((o) => o.status === 'open' && orderStatus(o) !== 'expired').length;
+  const items = [
+    { to: '/app', label: 'Overview', icon: LayoutGrid, end: true, count: mine.filter((o) => o.status === 'active').length || undefined },
+    ...(role === 'buyer' ? [{ to: '/app/orders/new', label: 'New order', icon: Plus }] : []),
+    { to: '/app/discover', label: 'Open orders', icon: role === 'supplier' ? Store : ShoppingBag, count: open || undefined },
   ];
-  return role === 'supplier' ? base.filter((n) => n.to !== '/app/orders/new') : base;
+  return items;
 }
 
 function Sidebar() {
   const nav = useNav();
   return (
     <aside className="ap-side">
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '0 12px', marginBottom: 28 }}>
+      <div className="ap-brand">
         <Wordmark size={22} />
         <Badge size="sm" mono>testnet</Badge>
       </div>
-      <nav aria-label="App" style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-        {nav.map(({ to, label, icon: Icon, end }) => (
-          <NavLink key={to} to={to} end={end} className="ap-nav"><Icon size={17} strokeWidth={1.5} />{label}</NavLink>
+      <Workspace />
+      <div className="ap-group">Workspace</div>
+      <nav aria-label="App" style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+        {nav.map(({ to, label, icon: Icon, end, count }) => (
+          <NavLink key={to} to={to} end={end} className="ap-nav"><Icon size={17} strokeWidth={1.6} />{label}{count ? <span className="ap-nav-count">{count}</span> : null}</NavLink>
         ))}
       </nav>
-      <div className="eyebrow" style={{ fontSize: 12.5, margin: '24px 13px 8px' }}>Resources</div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-        <Link className="ap-nav" to="/docs"><BookOpen size={17} strokeWidth={1.5} />Docs</Link>
-        <Link className="ap-nav" to="/"><ArrowLeft size={17} strokeWidth={1.5} />Back to site</Link>
+      <div className="ap-group">Account</div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+        <NavLink className="ap-nav" to="/app/settings"><Settings size={17} strokeWidth={1.6} />Settings</NavLink>
+        <Link className="ap-nav" to="/docs"><BookOpen size={17} strokeWidth={1.6} />Developer docs</Link>
+        <Link className="ap-nav" to="/"><ArrowLeft size={17} strokeWidth={1.6} />Back to site</Link>
       </div>
-      <div style={{ marginTop: 'auto' }}><NetworkCard /></div>
+      <div style={{ marginTop: 'auto' }}><StatusCard /></div>
     </aside>
+  );
+}
+
+function SearchBox() {
+  const { state } = useStore();
+  const [q, setQ] = useState('');
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLInputElement>(null);
+  const nav = useNavigate();
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); ref.current?.focus(); setOpen(true); } if (e.key === 'Escape') setOpen(false); };
+    window.addEventListener('keydown', onKey); return () => window.removeEventListener('keydown', onKey);
+  }, []);
+  const hits = useMemo(() => state.orders.filter((o) => o.title.toLowerCase().includes(q.toLowerCase())).slice(0, 6), [state.orders, q]);
+  return (
+    <div className="ap-search" style={{ position: 'relative' }}>
+      <Search size={15} strokeWidth={1.6} />
+      <input ref={ref} value={q} placeholder="Search orders" onChange={(e) => { setQ(e.target.value); setOpen(true); }} onFocus={() => setOpen(true)} onBlur={() => setTimeout(() => setOpen(false), 120)} onKeyDown={(e) => { if (e.key === 'Enter' && hits[0]) { nav(`/app/orders/${hits[0].id}`); setOpen(false); setQ(''); } }} />
+      <kbd>⌘K</kbd>
+      {open && q && (
+        <div className="ap-search-pop">
+          {hits.length === 0 ? <div style={{ padding: '9px 10px', fontSize: 13, color: 'var(--text-3)' }}>No orders match</div> : hits.map((o) => (
+            <Link key={o.id} to={`/app/orders/${o.id}`} className="ap-search-item" onMouseDown={(e) => e.preventDefault()} onClick={() => { setOpen(false); setQ(''); }}>
+              <span>{o.title}</span><span style={{ fontFamily: 'var(--font-mono)', fontSize: 11.5, color: 'var(--text-3)' }}>{orderStatus(o)}</span>
+            </Link>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
 
 function TopBar() {
   const { pathname } = useLocation();
-  const { me, role, setRole, ownerAddress, usingWallet, myTeam, mySupplier, signOut } = useStore();
+  const { me, role, setRole, ownerAddress, usingWallet, state, signOut, myTeam, mySupplier } = useStore();
   const { isCorrectNetwork } = useWallet();
-  const who = role === 'supplier' ? mySupplier?.name : myTeam?.name;
+  const [t, sub] = titleFor(pathname);
+  const recent = state.events.filter((e) => Date.now() - e.ts < 3_600_000).length;
+  const name = role === 'supplier' ? mySupplier?.name : myTeam?.name;
   return (
     <div className="ap-top">
-      <div>
-        <div style={{ fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: 19, letterSpacing: 'var(--ls-heading)', lineHeight: 1.2 }}>{titleFor(pathname)}</div>
+      <div className="ap-top-title">
+        <div style={{ fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: 19, letterSpacing: 'var(--ls-heading)', lineHeight: 1.2 }}>{t}</div>
+        {sub && <div className="ap-top-sub">{sub}</div>}
       </div>
-      {me?.account && (
-        <span className="ap-pill ap-rate" style={{ marginLeft: 'auto' }}>
-          {who ?? 'Set up'} · <span style={{ color: 'var(--fx-indigo)', fontWeight: 600 }}>1 call = 1 page</span>
-        </span>
-      )}
+      {me?.account && <SearchBox />}
       {me?.account && <Tabs<Role> items={[{ id: 'buyer', label: 'Buyer' }, { id: 'supplier', label: 'Supplier' }]} active={role} onChange={(r) => void setRole(r)} />}
+      {me?.account && (
+        <Link to="/app" className="ap-ibtn" aria-label="Activity" title={`${recent} events in the last hour`}>
+          <Bell size={16} strokeWidth={1.6} />
+          {recent > 0 && <span className="ap-badge">{recent > 9 ? '9+' : recent}</span>}
+        </Link>
+      )}
       {ownerAddress && (
-        <button type="button" onClick={() => { if (window.confirm('Sign out of Coquire?')) void signOut(); }} style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }} aria-label="Account">
-          <Badge tone={usingWallet ? (isCorrectNetwork ? 'accent' : 'warn') : 'neutral'} mono>{usingWallet ? (isCorrectNetwork ? shortAddr(ownerAddress) : 'wrong network') : `browser · ${shortAddr(ownerAddress)}`}</Badge>
+        <button type="button" className="ap-acct" style={{ width: 'auto', padding: '5px 10px 5px 6px', borderRadius: 99, gap: 8 }} onClick={() => { if (window.confirm('Sign out of Coquire?')) void signOut(); }} aria-label="Account">
+          <span className="ap-avatar" style={{ background: avatarColor(ownerAddress) }}>{(name ?? 'C')[0]?.toUpperCase()}</span>
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: usingWallet && !isCorrectNetwork ? 'var(--warn)' : 'var(--text-1)' }}>{usingWallet && !isCorrectNetwork ? 'wrong network' : shortAddr(ownerAddress)}</span>
+          <LogOut size={13} strokeWidth={1.6} style={{ color: 'var(--text-3)' }} />
         </button>
       )}
     </div>
@@ -96,6 +152,7 @@ function MobileBar() {
       {nav.map(({ to, label, icon: Icon, end }) => (
         <NavLink key={to} to={to} end={end} className="ap-nav" style={{ flex: 1 }}><Icon size={18} strokeWidth={1.5} />{label}</NavLink>
       ))}
+      <NavLink className="ap-nav" to="/app/settings" style={{ flex: 1 }}><Settings size={18} strokeWidth={1.5} />Settings</NavLink>
     </nav>
   );
 }
@@ -133,7 +190,7 @@ export function AppLayout() {
   const { pathname, search } = useLocation();
   const { ready, signedIn, me, toasts, dismiss } = useStore();
   const { isConnected, isCorrectNetwork } = useWallet();
-  useEffect(() => { document.title = `${titleFor(pathname)} · Coquire`; }, [pathname]);
+  useEffect(() => { document.title = `${titleFor(pathname)[0]} · Coquire`; }, [pathname]);
 
   const onboarded = !!(me?.account?.teamName || me?.account?.supplierName);
   const onboarding = pathname === '/app/onboard';
