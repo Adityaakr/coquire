@@ -32,8 +32,8 @@ async function switchToHederaTestnet() {
       method: 'wallet_switchEthereumChain',
       params: [{ chainId: HEDERA_TESTNET.chainIdHex }],
     });
-  } catch (err: any) {
-    if (err.code === 4902) {
+  } catch (err) {
+    if ((err as { code?: number }).code === 4902) {
       await window.ethereum.request({
         method: 'wallet_addEthereumChain',
         params: [{
