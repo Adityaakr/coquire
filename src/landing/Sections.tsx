@@ -17,8 +17,8 @@ export function Comparison() {
     io.observe(el);
     return () => io.disconnect();
   }, []);
-  const before = ['Each team pays the list rate for its own small volume', 'Suppliers see one tiny order and price it high', 'Every API call runs on a key with no spending limit', 'No way to prove what the agent was allowed to pay'];
-  const after = ['Two teams, one quote, the group rate for everyone', 'Suppliers see combined demand and funded balances', 'Your agent pays per call under a limit you signed once', 'The guard refuses anything outside the approved terms'];
+  const before = ['Each team pays the list rate for its small volume', 'Suppliers see one small order and price it high', 'Every call runs on a key with no spending limit', 'No proof of what the agent was allowed to pay'];
+  const after = ['One quote, one group rate for everyone', 'Suppliers see the combined demand', 'Your agent pays per call under a signed limit', 'The guard refuses anything off the terms'];
   return (
     <Section id="products" className="fx-compare">
       <Container max={760} className="fx-compare-wrap">
