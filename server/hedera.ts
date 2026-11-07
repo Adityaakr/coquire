@@ -30,7 +30,7 @@ export async function mirrorAccount(evmOrId: string): Promise<MirrorAccount | nu
 }
 
 /** Create the agent's account from its compressed secp256k1 public key. Returns the new account id and the creation transaction. */
-export async function createAgentAccount(agentPublicKeyHex: string, initialHbar = 1): Promise<{ accountId: string; txId: string }> {
+export async function createAgentAccount(agentPublicKeyHex: string, initialHbar = 0.2): Promise<{ accountId: string; txId: string }> {
   const evm = ethers.computeAddress(agentPublicKeyHex);
   const existing = await mirrorAccount(evm);
   if (existing) return { accountId: existing.account, txId: '' };

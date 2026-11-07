@@ -93,7 +93,7 @@ function order(id: string): Order {
   if (!o) throw Object.assign(new Error('Order not found'), { status: 404 });
   return o;
 }
-const fail = (res: Response, e: unknown) => { const err = e as Error & { status?: number }; res.status(err.status ?? 500).json({ error: err.message }); };
+const fail = (res: Response, e: unknown) => { const err = e as Error & { status?: unknown }; const code = typeof err.status === 'number' && err.status >= 400 && err.status < 600 ? err.status : 500; if (code === 500) console.error('[api]', err.message); res.status(code).json({ error: err.message }); };
 
 api.post('/orders', requireAuth, async (req, res) => {
   try {
