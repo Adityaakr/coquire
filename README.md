@@ -416,6 +416,23 @@ npm test
 
 End-to-end runs are Playwright scripts that drive two browser profiles against a running server: sign in, fund agents, list, join, auto-quote, approve, sign permissions, start, pay per page with real OCR and decrypted results, prove the guard, and collect HashScan receipts. They live outside the repo because they need funded testnet accounts.
 
+### Verified live run
+
+Recorded on 2026-11-07 against Hedera testnet with the x402.org facilitator and Arkiv Rabdi testnet.
+
+| Step | Evidence |
+|---|---|
+| Supplier treasury | account `0.0.11348836` (EVM `0x4218AAe2e9690368d11632B6a44F5389703A1757`) |
+| Agent accounts created on chain by the treasury, 0.2 HBAR float, 7 USDC each | team A `0.0.11349305`, team B `0.0.11349308` |
+| Order listed on Arkiv, auto-quoted at 150 pages, requoted at 200 after team B joined | 0.05 USDC then 0.045 USDC, both signed by the supplier key |
+| Both teams approved, signed permissions, order started | reservation 2.00 USDC split 1.50 / 0.50 by pages |
+| Per-call settlements through the facilitator | e.g. transaction `0.0.9185802@1794021741.563996925`: `CRYPTOTRANSFER SUCCESS`, 45000 micro-USDC from `0.0.11349305` to `0.0.11348836`, fee paid by the facilitator `0.0.9185802` |
+| Results sealed by the supplier and decrypted in the browser | invoice numbers visible only in the paying team's tab |
+| Guard declines | `OVER_RATE`, `REPLAY`, `WRONG_SUPPLIER` recorded with reasons; team B blocked with `NO_DELEGATION` until it signed, then paid |
+| Browser console errors | none |
+
+Every row in the Payments table links to HashScan at `https://hashscan.io/testnet/transaction/<id>`.
+
 ## Deploying
 
 `railway.json` describes one service: Nixpacks build, `npm ci && npm run build`, start with `npm start`, health check on `/api/health`, one replica.
