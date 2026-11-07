@@ -611,6 +611,14 @@
 .cq-rails-grid .cq-logo img,.cq-rails-grid .cq-logo-mark{width:16px;height:16px;font-size:8px}
 .cq-rails-grid>span:nth-child(2n){border-right:none}
 .cq-rails-grid>span:nth-last-child(-n+2){border-bottom:none}
+/* step 03: hub → rails, laid out in flow so nothing overlaps at any column width */
+.cq-pay-diag{display:flex;align-items:center;justify-content:center;gap:0}
+.cq-pay-hub{width:96px;height:96px;flex:0 0 96px;margin-left:14px}
+.cq-pay-link{flex:0 0 28px;height:2px;background:var(--fx-indigo);opacity:.5}
+.cq-pay-grid{position:static;transform:none;flex:0 0 auto}
+.cq-pay-grid>span{padding:9px 11px}
+.cq-pay-grid .cq-logo{font-size:12.5px}
+.cq-pay-grid .cq-logo img.cq-logo-word{height:14px}
 .cq-rails-link{position:absolute;left:150px;right:190px;top:50%;height:8px;background:var(--fx-indigo);transform:translateY(-50%);border-radius:4px}
 
 .cq-builton{display:flex;flex-direction:column;align-items:center;gap:40px;width:100%;margin-top:50px}

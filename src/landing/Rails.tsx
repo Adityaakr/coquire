@@ -120,10 +120,10 @@ function QuoteDiagram() {
 }
 function PayDiagram() {
   return (
-    <div className="cq-how-diag">
-      <span className="cq-hub" data-dark="true" style={{ position: 'absolute', left: 0, width: 110, height: 110 }}><span className="cq-hub-glow" /><CoquireMark size={48} /></span>
-      <span className="cq-rails-link" style={{ left: 110, right: 254 }} />
-      <span className="cq-rails-grid" style={{ width: 254 }}>
+    <div className="cq-how-diag cq-pay-diag">
+      <span className="cq-hub cq-pay-hub" data-dark="true"><span className="cq-hub-glow" /><CoquireMark size={44} /></span>
+      <span className="cq-pay-link" />
+      <span className="cq-rails-grid cq-pay-grid">
         <span><Logo name="hedera" /></span><span><Logo name="x402" /></span>
         <span><Logo name="usdc" /></span><span><Logo name="arkiv" /></span>
         <span><Logo name="ccip" /></span><span><Logo name="metamask" /></span>
