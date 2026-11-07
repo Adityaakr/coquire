@@ -15,6 +15,7 @@ import { quoteFor, requirementsFor, SUPPLIER_ID, supplierKey, supplierProfile } 
 import { publicKeyOf } from '../src/lib/ecies.js';
 import { discovery } from './arkiv.js';
 import { ccip } from './ccip.js';
+import { createAgentAccount, FUNDING_ENABLED, hashscanAccount, hashscanTx, mirrorAccount, sendUsdc, supplierBalances, USDC as USDC_TOKEN } from './hedera.js';
 
 export const api = Router();
 const json = (res: Response, v: unknown, status = 200) => { res.status(status).type('application/json').send(serialize(v)); };
@@ -317,6 +318,40 @@ api.post('/orders/:id/release', requireAuth, async (req, res) => {
     const r = await transfer(team.address, team.address, amount, `release:${o.id}`);
     apply(team.address, { type: 'REFUND', orderId: o.id, teamId: team.id, amount, txRef: r.txRef, ts: now() });
     json(res, { ok: true });
+  } catch (e) { fail(res, e); }
+});
+
+/* ---------- agent wallet on Hedera testnet ---------- */
+api.get('/wallet', requireAuth, async (req, res) => {
+  try {
+    const { account } = req as AuthedRequest;
+    const agent = account.agentAddress ? await mirrorAccount(account.agentAddress) : null;
+    const supplier = FUNDING_ENABLED ? await supplierBalances() : null;
+    json(res, { agent, fundingEnabled: FUNDING_ENABLED, supplierUsdc: supplier?.usdc ?? 0, usdcToken: USDC_TOKEN, hashscan: agent ? hashscanAccount(agent.account) : null });
+  } catch (e) { fail(res, e); }
+});
+
+/** Testnet convenience: the supplier account creates the agent's Hedera account and sends it USDC. Real transactions, real ids. */
+api.post('/wallet/fund', requireAuth, async (req, res) => {
+  try {
+    const { account } = req as AuthedRequest;
+    if (!FUNDING_ENABLED) throw Object.assign(new Error('Funding from the supplier account is disabled on this server'), { status: 400 });
+    if (!account.agentPublicKey) throw Object.assign(new Error('Agent key not registered'), { status: 400 });
+    const txs: { label: string; id: string; url: string }[] = [];
+    const created = await createAgentAccount(account.agentPublicKey, Number(process.env.AGENT_INITIAL_HBAR ?? '1'));
+    if (created.txId) txs.push({ label: `Account ${created.accountId} created with 1 HBAR`, id: created.txId, url: hashscanTx(created.txId) });
+    const want = usdc(process.env.AGENT_FUND_USDC ?? '5');
+    const before = await mirrorAccount(created.accountId);
+    const sup = await supplierBalances();
+    const have = BigInt(Math.round(((before?.usdc ?? 0) * 1e6)));
+    if (have < want && (sup?.usdc ?? 0) * 1e6 >= Number(want - have)) {
+      const sent = await sendUsdc(created.accountId, want - have);
+      txs.push({ label: `${(Number(want - have) / 1e6).toFixed(2)} USDC sent from the supplier`, id: sent.txId, url: hashscanTx(sent.txId) });
+    }
+    apply(account.address, { type: 'LOG', kind: 'wallet', text: `Agent account ${created.accountId} funded on Hedera testnet (${txs.length} transaction${txs.length === 1 ? '' : 's'})` });
+    await new Promise((r) => setTimeout(r, 2500));
+    const after = await mirrorAccount(created.accountId);
+    json(res, { accountId: created.accountId, txs, agent: after, supplierUsdc: (await supplierBalances())?.usdc ?? 0, hashscan: hashscanAccount(created.accountId) });
   } catch (e) { fail(res, e); }
 });
 

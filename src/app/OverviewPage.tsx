@@ -55,7 +55,7 @@ function Balance() {
       </div>
       <div className="px-note">
         <span className="px-pill"><span className="ap-dot" data-on={live ? 'true' : 'sim'} />Hedera testnet</span>
-        <span>{st?.accountId ? `Agent account ${st.accountId}. ` : 'No agent account yet. '}{live ? 'Per-call fees are sponsored by the x402 facilitator.' : 'Settlement is simulated on this server.'}</span>
+        <span>{st?.accountId ? `Agent account ${st.accountId}. ` : 'No agent account yet. '}{live ? 'An ordinary Hedera account: any x402 client can pay the supplier from it, fees sponsored by the facilitator.' : 'Settlement is simulated on this server.'}</span>
       </div>
     </>
   );
