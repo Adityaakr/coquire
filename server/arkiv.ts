@@ -50,9 +50,10 @@ export const discovery = {
     const s = await load();
     if (s) {
       const days = Math.max(1, Math.ceil((order.offerWindowEnd - Date.now()) / 86_400_000));
+      const h = s.helpers;
       const { entityKey } = await s.wallet.createEntity(s.Orders, {
-        orderId: order.id, title: order.title, status: 'open', pages: String(totalCalls(order)), createdBy: order.createdBy.startsWith('0x') ? order.createdBy : '0x0000000000000000000000000000000000000000', neededBy: String(order.neededBy),
-        body: new TextEncoder().encode(JSON.stringify({ description: order.description, teams: order.teams.map((t) => ({ teamId: t.teamId, calls: t.calls })), offerWindowEnd: order.offerWindowEnd })),
+        orderId: order.id, title: order.title, status: 'open', pages: h.dec(String(totalCalls(order))), createdBy: h.addr(order.createdBy.startsWith('0x') ? order.createdBy : '0x0000000000000000000000000000000000000000'), neededBy: h.dec(String(order.neededBy)),
+        body: h.bytes(new TextEncoder().encode(JSON.stringify({ description: order.description, teams: order.teams.map((t) => ({ teamId: t.teamId, calls: t.calls })), offerWindowEnd: order.offerWindowEnd }))),
       }, { expiration: s.ExpirationTime.fromDays(days) });
       return { listingId: entityKey, expiresAt: order.offerWindowEnd, url: `https://rabdi.explorer.arkiv.network/entity/${entityKey}`, live: true };
     }
@@ -63,9 +64,10 @@ export const discovery = {
     const s = await load();
     if (!s) return null;
     const days = Math.max(1, Math.ceil((order.offerWindowEnd - Date.now()) / 86_400_000));
+    const h = s.helpers;
     const { entityKey } = await s.wallet.createEntity(s.Quotes, {
-      orderId: order.id, supplier: '0x0000000000000000000000000000000000000000', ratePerCall: quote.ratePerCall.toString(), reservationFee: quote.reservationFee.toString(), signature: quote.signature,
-      body: new TextEncoder().encode(JSON.stringify({ deliveryWindowHours: quote.deliveryWindowHours, sampleOffered: quote.sampleOffered, submittedAt: quote.submittedAt })),
+      orderId: order.id, supplier: h.addr('0x0000000000000000000000000000000000000000'), ratePerCall: h.dec(quote.ratePerCall.toString()), reservationFee: h.dec(quote.reservationFee.toString()), signature: quote.signature,
+      body: h.bytes(new TextEncoder().encode(JSON.stringify({ deliveryWindowHours: quote.deliveryWindowHours, sampleOffered: quote.sampleOffered, submittedAt: quote.submittedAt }))),
     }, { expiration: s.ExpirationTime.fromDays(days) });
     return entityKey;
   },
