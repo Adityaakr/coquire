@@ -288,7 +288,8 @@ api.post('/orders/:id/pay', requireAuth, async (req, res) => {
     // 4. hand the settled payment to the supplier over HTTP, like any x402 client would
     if (sup.id === SUPPLIER_ID && base.sealedRequestRef) {
       try {
-        const origin = process.env.APP_ORIGIN ?? `http://localhost:${process.env.PORT ?? 3000}`;
+        // same process: call the supplier over loopback regardless of the public origin
+        const origin = process.env.SELF_ORIGIN ?? `http://127.0.0.1:${process.env.PORT ?? 3000}`;
         const header = Buffer.from(JSON.stringify({ txRef: receipt.txRef, amount: amount.toString(), payer: account.agentAddress, guardSignature })).toString('base64');
         const r = await fetch(`${origin}/supplier/v1/pages/${requestId}`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-PAYMENT': header }, body: JSON.stringify({ sealedRequestRef: base.sealedRequestRef, orderId: o.id, teamId: team.id }) });
         const out = await r.json() as { sealedResultRef?: string; error?: string };
