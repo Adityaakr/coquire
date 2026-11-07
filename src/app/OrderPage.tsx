@@ -300,7 +300,8 @@ function ExecutionTab({ order, isMember }: { order: Order; isMember: boolean }) 
   const remaining = Math.max(0, budget.calls - budget.done);
   const running = agentRunning === order.id;
   const pct = budget.limit > 0n ? Number((budget.spent * 1000n) / budget.limit) / 10 : 0;
-  const prove = (opts: Parameters<typeof payForPage>[1]) => payForPage(order.id, opts).then((p) => p && notify('warn', describeVerdict(p.verdict, fmt)));
+  const safePay = (opts?: Parameters<typeof payForPage>[1]) => payForPage(order.id, opts).catch((e) => { notify('danger', 'Payment not sent', (e as Error).message); return null; });
+  const prove = (opts: Parameters<typeof payForPage>[1]) => safePay(opts).then((p) => p && notify('warn', describeVerdict(p.verdict, fmt)));
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
@@ -363,7 +364,7 @@ function ExecutionTab({ order, isMember }: { order: Order; isMember: boolean }) 
             <div style={{ display: 'flex', gap: 10, marginTop: 14, flexWrap: 'wrap' }}>
               <Button size="md" disabled={status !== 'active' || running || remaining === 0} onClick={() => runAgent(order.id, Math.min(25, remaining))}>Run agent for {Math.min(25, remaining)} pages</Button>
               {remaining > 25 && <Button size="md" variant="secondary" disabled={status !== 'active' || running} onClick={() => runAgent(order.id, remaining)}>Run all {remaining}</Button>}
-              <Button size="md" variant="secondary" disabled={status !== 'active' || running || remaining === 0} onClick={() => payForPage(order.id)}>Process one page</Button>
+              <Button size="md" variant="secondary" disabled={status !== 'active' || running || remaining === 0} onClick={() => void safePay()}>Process one page</Button>
               {running && <Button size="md" variant="ghost" onClick={stopAgent}>Stop</Button>}
             </div>
             <div style={{ marginTop: 16, border: '1px dashed var(--accent-line)', background: 'var(--accent-soft)', borderRadius: 14, padding: '12px 14px' }}>

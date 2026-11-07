@@ -264,11 +264,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         if (remainingAllowance(s, order, team.id) < (approvedQuote(order)?.ratePerCall ?? 0n)) break;
         const b = teamBudget(s, order, team.id);
         if (b.done >= b.calls) break;
-        await payForPage(orderId);
+        try { await payForPage(orderId); } catch (e) { notify('danger', 'Agent stopped', (e as Error).message); break; }
         await sleep(80);
       }
     } finally { setAgentRunning(null); }
-  }, [payForPage]);
+  }, [notify, payForPage]);
   const stopAgent = useCallback(() => { stopFlag.current = true; }, []);
 
   const refundUnused = useCallback<StoreValue['refundUnused']>(async (orderId) =>
