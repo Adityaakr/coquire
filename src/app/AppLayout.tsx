@@ -5,8 +5,9 @@ import './app.css';
 import { Badge, Bento, Button, Tabs, Toast } from '@/ui';
 import { useStore } from '@/store/store';
 import { useWallet } from '@/contexts/WalletContext';
+import { hasMetaMask } from '@/lib/wallet';
 import { HEDERA_TESTNET } from '@/config/hedera';
-import { Wordmark } from '@/landing/Nav';
+import { CoquireMark, Wordmark } from '@/landing/Nav';
 import { orderStatus } from '@/domain/selectors';
 import { avatarColor, shortAddr } from './kit';
 import type { Role } from '@/domain/types';
@@ -160,36 +161,35 @@ function MobileBar() {
 function SignIn() {
   const { signIn, busy, notify } = useStore();
   const [err, setErr] = useState<string | null>(null);
+  const [mm, setMm] = useState(false);
+  useEffect(() => { const t = setTimeout(() => setMm(hasMetaMask()), 200); return () => clearTimeout(t); }, []);
   const go = async (mode: 'wallet' | 'browser') => {
     setErr(null);
-    try { await signIn(mode); } catch (e) { setErr((e as Error).message); notify('danger', 'Sign-in failed', (e as Error).message); }
+    try { await signIn(mode); } catch (e) { const m = (e as Error).message; setErr(m); notify('danger', 'Sign-in failed', m); }
   };
-  const hasMetaMask = typeof window !== 'undefined' && !!window.ethereum;
   return (
-    <div style={{ maxWidth: 560, margin: '40px auto', display: 'flex', flexDirection: 'column', gap: 20 }}>
+    <div style={{ maxWidth: 400, margin: '56px auto 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 18, textAlign: 'center' }}>
+      <CoquireMark size={48} />
       <div>
-        <div className="eyebrow">Sign in</div>
-        <h1 style={{ fontSize: 32, marginTop: 8 }}>One signature registers your agent key</h1>
-        <p style={{ color: 'var(--text-2)', marginTop: 8, fontSize: 15, lineHeight: 1.55 }}>Your account signs a sign-in message that binds a local agent key to it. The agent key signs each per-call payment and receives sealed results, so your wallet is never prompted per call.</p>
+        <h1 style={{ fontSize: 24 }}>Sign in to Coquire</h1>
+        <p style={{ color: 'var(--text-3)', marginTop: 6, fontSize: 13.5 }}>One signature. Your agent key does the rest.</p>
       </div>
-      <Bento variant="app" pad={24}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <Button size="xl" block loading={!!busy.signIn} disabled={!hasMetaMask} onClick={() => go('wallet')}>{hasMetaMask ? 'Sign in with MetaMask (Hedera testnet)' : 'MetaMask not detected'}</Button>
-          <Button size="xl" block variant="secondary" loading={!!busy.signIn} onClick={() => go('browser')}>Use a browser key</Button>
+      <Bento variant="app" pad={14} style={{ width: '100%' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <Button size="lg" block loading={!!busy.signIn} disabled={!mm} onClick={() => go('wallet')}>{mm ? 'Continue with MetaMask' : 'MetaMask not detected'}</Button>
+          <Button size="lg" block variant="secondary" loading={!!busy.signIn} onClick={() => go('browser')}>Continue with a browser key</Button>
         </div>
-        <p style={{ fontSize: 12.5, color: 'var(--text-3)', lineHeight: 1.6, marginTop: 14 }}>
-          A browser key is a real secp256k1 key stored in this browser. It signs the same messages a wallet would. Use it on a second device or profile to act as the other team.
-        </p>
-        {err && <p role="alert" style={{ fontSize: 13, color: 'var(--danger)', marginTop: 8 }}>{err}</p>}
       </Bento>
+      <p style={{ fontSize: 12, color: 'var(--text-3)', lineHeight: 1.5, maxWidth: 320 }}>Hedera testnet. A browser key is a real key kept in this browser; use it on a second profile to act as the other team.</p>
+      {err && <p role="alert" style={{ fontSize: 12.5, color: 'var(--danger)' }}>{err}</p>}
     </div>
   );
 }
 
 export function AppLayout() {
   const { pathname, search } = useLocation();
-  const { ready, signedIn, me, toasts, dismiss } = useStore();
-  const { isConnected, isCorrectNetwork } = useWallet();
+  const { ready, signedIn, me, toasts, dismiss, usingWallet } = useStore();
+  const { isCorrectNetwork } = useWallet();
   useEffect(() => { document.title = `${titleFor(pathname)[0]} · Coquire`; }, [pathname]);
 
   const onboarded = !!(me?.account?.teamName || me?.account?.supplierName);
@@ -202,7 +202,7 @@ export function AppLayout() {
       {signedIn && onboarded && <Sidebar />}
       <main className="ap-main">
         <TopBar />
-        {isConnected && !isCorrectNetwork && (
+        {usingWallet && !isCorrectNetwork && (
           <div style={{ padding: '8px 30px', fontSize: 13, color: '#7A4B00', background: '#FFF7E6', borderBottom: '1px solid #F5D9A8' }}>
             Your wallet is on another network. Switch to {HEDERA_TESTNET.name} (chain {HEDERA_TESTNET.chainId}) to sign with it.
           </div>

@@ -39,6 +39,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   const [provider, setProvider] = useState<ethers.BrowserProvider | null>(null);
   const [signer, setSigner] = useState<ethers.JsonRpcSigner | null>(null);
   const [isConnecting, setIsConnecting] = useState(false);
+  const rawRef = useRef<{ on?: (e: string, h: (...a: never[]) => void) => void; removeListener?: (e: string, h: (...a: never[]) => void) => void } | null>(null);
 
   const isConnected = !!address;
   const isCorrectNetwork = chainId === HEDERA_TESTNET.chainId;
@@ -47,12 +48,14 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     setIsConnecting(true);
     try {
       const result = await connectMetaMask();
+      rawRef.current = result.raw;
       setProvider(result.provider);
       setSigner(result.signer);
       setAddress(result.address);
       setChainId(result.chainId);
     } catch (err) {
       console.error('Wallet connection failed:', err);
+      throw err;
     } finally {
       setIsConnecting(false);
     }
@@ -63,6 +66,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   const getSigner = useCallback(async () => {
     if (signerRef.current) return signerRef.current;
     const result = await connectMetaMask();
+    rawRef.current = result.raw;
     setProvider(result.provider); setSigner(result.signer); setAddress(result.address); setChainId(result.chainId);
     return result.signer;
   }, []);
@@ -75,7 +79,8 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    if (!window.ethereum) return;
+    const raw = rawRef.current;
+    if (!raw?.on) return;
 
     const handleAccountsChanged = (...args: never[]) => {
       const accounts = args[0] as unknown as string[];
@@ -94,12 +99,12 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       }
     };
 
-    window.ethereum.on('accountsChanged', handleAccountsChanged);
-    window.ethereum.on('chainChanged', handleChainChanged);
+    raw.on('accountsChanged', handleAccountsChanged as never);
+    raw.on('chainChanged', handleChainChanged as never);
 
     return () => {
-      window.ethereum?.removeListener('accountsChanged', handleAccountsChanged);
-      window.ethereum?.removeListener('chainChanged', handleChainChanged);
+      raw.removeListener?.('accountsChanged', handleAccountsChanged as never);
+      raw.removeListener?.('chainChanged', handleChainChanged as never);
     };
   }, [address, connect, disconnect]);
 
