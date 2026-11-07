@@ -5,7 +5,7 @@
  * Steps: resolve the account id behind the key's EVM alias (the account is auto-created when HBAR is sent to it),
  * associate USDC 0.0.429274 if needed, print the account id and balances.
  */
-import { AccountBalanceQuery, AccountId, Client, PrivateKey, TokenAssociateTransaction, TokenId } from '@hiero-ledger/sdk';
+import { AccountId, Client, PrivateKey, TokenAssociateTransaction, TokenId } from '@hiero-ledger/sdk';
 import { ethers } from 'ethers';
 
 const USDC = process.env.HEDERA_USDC_TOKEN_ID ?? '0.0.429274';
@@ -31,7 +31,8 @@ if (already) {
   const rc = await res.getReceipt(client);
   console.log('associated USDC', USDC, 'status', rc.status.toString(), 'tx', res.transactionId.toString());
 }
-const bal = await new AccountBalanceQuery().setAccountId(AccountId.fromString(info.account)).execute(client);
-console.log('USDC balance', bal.tokens?.get(TokenId.fromString(USDC))?.toString() ?? '0', '(base units, 6 decimals)');
+await new Promise((r) => setTimeout(r, 3000));
+const after = (await (await fetch(`${MIRROR}/api/v1/accounts/${info.account}/tokens?token.id=${USDC}`)).json()) as { tokens?: { balance: number }[] };
+console.log('USDC', after.tokens?.length ? `associated · balance ${(after.tokens[0].balance / 1e6).toFixed(2)} USDC` : 'not associated yet (mirror node may lag a few seconds)');
 if (arg === 'supplier') console.log(`\nSet in .env and Railway:\nSUPPLIER_HEDERA_ACCOUNT_ID=${info.account}`);
 client.close();
