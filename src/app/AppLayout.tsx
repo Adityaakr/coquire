@@ -36,12 +36,12 @@ function Sidebar() {
 
 function TopBar() {
   const { pathname } = useLocation();
-  const { me, ownerAddress, usingWallet, signOut, myTeam, mySupplier, role } = useStore();
+  const { me, ownerAddress, usingWallet, signOut, myTeam, mySupplier, role, signedIn } = useStore();
   const { isCorrectNetwork } = useWallet();
   const name = (role === 'supplier' ? mySupplier?.name : myTeam?.name) ?? 'C';
   return (
     <div className="ap-top">
-      <div className="px-title">{titleFor(pathname)}</div>
+      {signedIn ? <div className="px-title">{titleFor(pathname)}</div> : <Link to="/" className="px-brand" style={{ padding: 0 }}><CoquireMark size={28} />Coquire</Link>}
       <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 12 }}>
         {me?.account && <span className="px-pill"><span className="ap-dot" data-on={me.facilitator.live ? 'true' : 'sim'} />{HEDERA_TESTNET.name}{usingWallet && !isCorrectNetwork ? ' · wrong network' : ''}</span>}
         {ownerAddress && (

@@ -21,7 +21,9 @@ function OrderRows({ orders, empty, supplierView }: { orders: Order[]; empty: st
         const settled = settledPayments(state, o.id).length;
         const creator = state.teams.find((t) => t.id === o.createdBy);
         const myQuote = o.quotes.find((x) => x.supplierId === mySupplier?.id);
-        const right = supplierView && myQuote ? (q?.id === myQuote.id ? 'Approved' : o.approvedQuoteId ? 'Not selected' : 'Quote pending') : STATUS_LABEL[st];
+        const right = supplierView
+          ? myQuote ? (q?.id === myQuote.id ? 'Approved' : o.approvedQuoteId ? 'Not selected' : 'Quote pending') : o.quotes.length ? `${o.quotes.length} other ${o.quotes.length === 1 ? 'quote' : 'quotes'}` : 'No quotes yet'
+          : STATUS_LABEL[st];
         const sub = st === 'active' || st === 'completed'
           ? <><span className="mono">{settled}/{totalCalls(o)}</span> pages settled{q ? <> at <span className="mono">{(Number(q.ratePerCall) / 1e6).toFixed(3)}</span> USDC</> : null}</>
           : st === 'open' || st === 'quoted' ? <>{creator?.name}, {o.quotes.length} {o.quotes.length === 1 ? 'quote' : 'quotes'}, <Countdown until={o.offerWindowEnd} prefix="closes in" /></>
