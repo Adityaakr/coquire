@@ -1,8 +1,9 @@
 import { useEffect } from 'react';
 import './landing.css';
 import { LandingNav } from './Nav';
-import { Clients, Hero } from './Hero';
-import { Comparison, Features, Integrations, Overview, Security, Stats, Steps, Testimonials, UseCases } from './Sections';
+import { Hero } from './Hero';
+import { Comparison, Features, Integrations, Overview, Stats, Testimonials, UseCases } from './Sections';
+import { BuiltOn, BuiltOnTicker, HowItWorksDiagram, PrivacyFlow, UseCaseGrid } from './Rails';
 import { FAQs, Footer, Pricing } from './Closing';
 
 export function LandingPage() {
@@ -12,13 +13,15 @@ export function LandingPage() {
       <LandingNav />
       <main>
         <Hero />
-        <Clients />
+        <BuiltOnTicker />
         <Comparison />
         <Features />
+        <UseCaseGrid />
         <Overview />
-        <Steps />
-        <Security />
+        <HowItWorksDiagram />
+        <PrivacyFlow />
         <UseCases />
+        <BuiltOn />
         <Integrations />
         <Stats />
         <Testimonials />

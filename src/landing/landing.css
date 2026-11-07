@@ -567,3 +567,73 @@
   .fx-buttons .fx-btn,.fx-buttons .fx-btnic{width:100%;justify-content:center}
   .fx-buttons .fx-btnic-in{width:100%;justify-content:center}
 }
+
+/* ───────── Coquire sections: use cases, how it works, built on, privacy ───────── */
+.cq-logo{display:inline-flex;align-items:center;gap:7px;color:var(--fx-jet);font-family:var(--font-display);font-weight:600;font-size:15px;letter-spacing:-0.01em;white-space:nowrap}
+.cq-logo img{width:18px;height:18px;display:block}
+.cq-logo-mark{width:18px;height:18px;border-radius:5px;background:var(--fx-jet);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:9px;font-weight:700}
+.cq-logo-mark[data-c=blue]{background:var(--fx-indigo)}
+.cq-logo-mark[data-c=green]{background:#10B981}
+.cq-logo-mark[data-c=orange]{background:#FF8B06}
+.cq-logo-lg{font-size:22px;gap:10px}
+.cq-logo-lg img,.cq-logo-lg .cq-logo-mark{width:28px;height:28px;border-radius:8px;font-size:12px}
+.cq-by{display:flex;align-items:center;gap:14px;flex-wrap:wrap;color:var(--fx-silver);font-size:14px}
+.cq-by .cq-logo{font-size:14px}
+
+.cq-cases{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;width:100%;margin-top:50px}
+.cq-case{background:#fff;border:1px solid var(--fx-mist);border-radius:24px;padding:30px;display:flex;flex-direction:column;gap:14px;min-height:260px;position:relative;overflow:hidden}
+.cq-case-ic{width:44px;height:44px;border-radius:12px;background:var(--accent-soft);color:var(--fx-indigo);display:inline-flex;align-items:center;justify-content:center}
+.cq-case-t{font-family:var(--font-display);font-weight:600;font-size:22px;line-height:1.2;color:var(--fx-jet)}
+.cq-case-d{font-size:16px;line-height:1.4;color:var(--fx-slate);flex:1}
+.cq-case-photo{position:absolute;right:-30px;top:-30px;width:150px;height:150px;border-radius:50%;object-fit:cover;opacity:.9;mask-image:radial-gradient(circle at center,#000 45%,transparent 72%);-webkit-mask-image:radial-gradient(circle at center,#000 45%,transparent 72%)}
+
+.cq-how{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:30px;align-items:center;width:100%;margin-top:60px}
+.cq-how-arrow{color:var(--fx-silver);display:flex;align-items:center;justify-content:center;padding-bottom:160px}
+.cq-how-step{display:flex;flex-direction:column;align-items:center;text-align:center;gap:18px}
+.cq-how-diag{width:100%;max-width:360px;height:320px;position:relative;display:flex;align-items:center;justify-content:center}
+.cq-how-n{font-family:var(--font-mono);font-size:14px;color:var(--fx-slate);letter-spacing:.08em}
+.cq-how-t{font-family:var(--font-display);font-weight:600;font-size:26px;color:var(--fx-jet);margin-top:4px}
+.cq-how-t[data-accent=true]{color:var(--fx-indigo)}
+.cq-how-d{font-size:17px;line-height:1.4;color:var(--fx-slate);max-width:30ch}
+.cq-hub{width:150px;height:150px;border-radius:50%;background:#fff;border:2px solid var(--fx-indigo);display:flex;align-items:center;justify-content:center;position:relative;z-index:2;box-shadow:0 20px 40px -20px rgba(29,29,29,.3)}
+.cq-hub[data-dark=true]{background:var(--grad-dark);border-color:var(--fx-jet)}
+.cq-hub-glow{position:absolute;inset:-18px;border-radius:50%;background:var(--fx-lgb);z-index:-1}
+.cq-node{position:absolute;width:48px;height:48px;border-radius:50%;background:var(--fx-lgb);border:1px solid var(--fx-mist);display:flex;align-items:center;justify-content:center;color:var(--fx-indigo)}
+.cq-node-l{position:absolute;height:2px;background:var(--fx-indigo);opacity:.35;transform-origin:left center}
+.cq-card-stack{position:absolute;background:#fff;border:1px solid var(--fx-mist);border-radius:14px;padding:12px 16px;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:14px;font-weight:500;color:var(--fx-jet);box-shadow:0 10px 24px -14px rgba(29,29,29,.3),0 4px 0 -1px #fff,0 5px 0 0 var(--fx-mist),0 9px 0 -1px #fff,0 10px 0 0 var(--fx-mist)}
+.cq-card-stack svg{color:var(--fx-indigo)}
+.cq-orbit{position:absolute;width:300px;height:220px;border:2px solid var(--fx-indigo);border-radius:50%;opacity:.5}
+.cq-rails-grid{position:absolute;right:0;top:50%;transform:translateY(-50%);display:grid;grid-template-columns:1fr 1fr;border:2px solid var(--fx-indigo);border-radius:8px;background:#fff;overflow:hidden}
+.cq-rails-grid>span{padding:11px 12px;border-right:1px solid var(--fx-mist);border-bottom:1px solid var(--fx-mist);display:flex;align-items:center;justify-content:flex-start;background:#fff}
+.cq-rails-grid .cq-logo{font-size:13px;gap:6px}
+.cq-rails-grid .cq-logo img,.cq-rails-grid .cq-logo-mark{width:16px;height:16px;font-size:8px}
+.cq-rails-grid>span:nth-child(2n){border-right:none}
+.cq-rails-grid>span:nth-last-child(-n+2){border-bottom:none}
+.cq-rails-link{position:absolute;left:150px;right:190px;top:50%;height:8px;background:var(--fx-indigo);transform:translateY(-50%);border-radius:4px}
+
+.cq-builton{display:flex;flex-direction:column;align-items:center;gap:40px;width:100%;margin-top:50px}
+.cq-builton-row{display:grid;grid-template-columns:repeat(4,1fr);width:100%;max-width:1100px}
+.cq-builton-cell{display:flex;flex-direction:column;align-items:center;gap:14px;padding:30px 20px;border-right:1px solid var(--fx-mist);text-align:center}
+.cq-builton-cell:last-child{border-right:none}
+.cq-builton-role{font-size:15px;color:var(--fx-slate)}
+.cq-builton-tag{font-family:var(--font-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--fx-indigo);background:var(--accent-soft);border-radius:99px;padding:3px 9px}
+
+.cq-priv{display:grid;grid-template-columns:1.15fr 1fr;gap:50px;align-items:center;width:100%;margin-top:50px}
+.cq-priv-diag{position:relative;height:460px;background:#fff;border:1px solid var(--fx-mist);border-radius:30px;overflow:hidden}
+.cq-priv-lbl{position:absolute;top:28px;font-size:16px;font-weight:600;color:var(--fx-slate)}
+.cq-priv-team{position:absolute;display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--fx-jet)}
+.cq-priv-team i{width:26px;height:26px;border-radius:50%;background:var(--fx-indigo);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-style:normal;font-size:11px;font-weight:600;font-family:var(--font-display)}
+.cq-priv-hub{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:170px;height:170px;border-radius:50%;background:var(--grad-dark);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;box-shadow:0 0 0 22px var(--fx-lgb);z-index:2}
+.cq-priv-hub b{font-family:var(--font-display);font-weight:600;font-size:18px}
+.cq-priv-hub span{font-size:12.5px;color:var(--fx-silver)}
+.cq-priv-right{position:absolute;right:28px;display:flex;align-items:center;gap:10px;font-size:14px;font-weight:600;color:var(--fx-jet)}
+.cq-priv-right small{font-family:var(--font-mono);font-weight:500;font-size:11px;color:var(--fx-indigo);letter-spacing:.06em}
+.cq-priv-list{display:flex;flex-direction:column;gap:14px;width:100%}
+.cq-priv-item{display:flex;gap:14px;padding:18px 20px;border:1px solid var(--fx-mist);border-radius:18px;background:#fff}
+.cq-priv-item-ic{width:40px;height:40px;border-radius:12px;background:var(--fx-lgb);color:var(--fx-jet);display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.cq-priv-item-t{font-family:var(--font-display);font-weight:600;font-size:18px;color:var(--fx-jet)}
+.cq-priv-item-d{font-size:15px;color:var(--fx-slate);margin-top:4px;line-height:1.4}
+.cq-priv-item[data-public=true] .cq-priv-item-ic{background:var(--accent-soft);color:var(--fx-indigo)}
+
+@media (max-width:1199px){.cq-builton-row{grid-template-columns:1fr 1fr}.cq-builton-cell:nth-child(2n){border-right:none}.cq-cases{grid-template-columns:1fr 1fr}.cq-how{grid-template-columns:1fr;gap:40px}.cq-how-arrow{display:none}.cq-priv{grid-template-columns:1fr}.cq-builton-cell{min-width:180px;padding:24px 20px}}
+@media (max-width:809px){.cq-cases{grid-template-columns:1fr}.cq-how-diag{height:280px;max-width:320px}.cq-priv-diag{height:420px}.cq-builton-row{grid-template-columns:1fr}.cq-builton-cell{border-right:none;border-bottom:1px solid var(--fx-mist);width:100%}.cq-rails-grid>span{padding:10px 12px}}
