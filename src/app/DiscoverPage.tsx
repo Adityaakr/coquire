@@ -10,6 +10,7 @@ export function DiscoverPage() {
   const live = !!me?.arkiv.live;
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+      <div><h1 className="px-h1">Market</h1><p className="px-lead">Funded group orders. Join one as a buyer, or quote it as a supplier.</p></div>
       <Bento variant="app" pad={0}>
         <div style={{ padding: '20px 26px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
           <div>

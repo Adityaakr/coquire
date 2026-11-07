@@ -12,6 +12,7 @@ import { NewOrderPage } from '@/app/NewOrderPage';
 import { OrderPage } from '@/app/OrderPage';
 import { DiscoverPage } from '@/app/DiscoverPage';
 import { SettingsPage } from '@/app/SettingsPage';
+import { WalletPage } from '@/app/WalletPage';
 
 function NotFound() {
   return (
@@ -42,6 +43,7 @@ export default function App() {
               <Route path="orders/new" element={<NewOrderPage />} />
               <Route path="orders/:id" element={<OrderPage />} />
               <Route path="discover" element={<DiscoverPage />} />
+              <Route path="wallet" element={<WalletPage />} />
               <Route path="settings" element={<SettingsPage />} />
             </Route>
             <Route path="*" element={<NotFound />} />

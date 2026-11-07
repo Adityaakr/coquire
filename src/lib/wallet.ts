@@ -38,10 +38,14 @@ export function hasMetaMask(): boolean {
 export async function connectMetaMask(): Promise<{ provider: ethers.BrowserProvider; signer: ethers.JsonRpcSigner; address: string; chainId: number; raw: Eip1193 }> {
   const raw = await getMetaMaskProvider();
   if (!raw) throw new Error('MetaMask is not installed. Install it or use a browser key.');
-  const provider = new ethers.BrowserProvider(raw as never);
+  let provider = new ethers.BrowserProvider(raw as never);
   await provider.send('eth_requestAccounts', []);
   const network = await provider.getNetwork();
-  if (Number(network.chainId) !== HEDERA_TESTNET.chainId) await switchToHederaTestnet(raw);
+  if (Number(network.chainId) !== HEDERA_TESTNET.chainId) {
+    await switchToHederaTestnet(raw);
+    // ethers pins the network per provider instance; rebuild it after the switch so it does not throw "network changed".
+    provider = new ethers.BrowserProvider(raw as never);
+  }
   const signer = await provider.getSigner();
   const address = await signer.getAddress();
   const updated = await provider.getNetwork();
