@@ -274,6 +274,7 @@ api.post('/orders/:id/pay', requireAuth, async (req, res) => {
     let live: { payload: LivePayload; requirements: LiveRequirements } | undefined;
     if (X402_LIVE) {
       if (!b.x402Payload) throw Object.assign(new Error('Live settlement needs x402Payload from the agent'), { status: 400 });
+      console.log('[pay]', requestId, 'live payload received, amount', amount.toString());
       const payToAccount = payeeSupplierId === SUPPLIER_ID ? process.env.SUPPLIER_HEDERA_ACCOUNT_ID! : String(b.payToAccountId ?? '');
       const lr = await liveRequirements(amount, payToAccount, requirements.resource);
       live = { payload: b.x402Payload as LivePayload, requirements: { scheme: lr.scheme, network: lr.network, asset: lr.asset, amount: lr.amount, payTo: lr.payTo, maxTimeoutSeconds: lr.maxTimeoutSeconds, extra: lr.extra } };
@@ -282,6 +283,7 @@ api.post('/orders/:id/pay', requireAuth, async (req, res) => {
     const payment: Payment = { ...base, status: 'settled', verdict, guardSignature, txRef: receipt.txRef, ts: receipt.settledAt };
     apply(account.address, { type: 'RECORD_PAYMENT', payment });
     json(res, { payment, remaining: remainingAllowance(getState(), getState().orders.find((x) => x.id === o.id)!, team.id) });
+    console.log('[pay]', requestId, 'settled', receipt.txRef);
 
     // 4. hand the settled payment to the supplier over HTTP, like any x402 client would
     if (sup.id === SUPPLIER_ID && base.sealedRequestRef) {

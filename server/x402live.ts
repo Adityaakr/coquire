@@ -51,9 +51,10 @@ export async function liveRequirements(amount: Micro, payToAccountId: string, re
 export async function verifyAndSettle(payload: LivePayload, requirements: LiveRequirements): Promise<{ transactionId: string; payer?: string }> {
   const f = await facilitator();
   const v = await f.verify(payload, requirements);
-  if (!v.isValid) throw new Error(`Facilitator rejected the payment: ${v.invalidReason ?? ''} ${v.invalidMessage ?? ''}`.trim());
+  if (!v.isValid) { console.warn('[x402] verify rejected', v.invalidReason, v.invalidMessage); throw new Error(`Facilitator rejected the payment: ${v.invalidReason ?? ''} ${v.invalidMessage ?? ''}`.trim()); }
   const s = await f.settle(payload, requirements);
-  if (!s.success) throw new Error(`Settlement failed: ${s.errorReason ?? ''} ${s.errorMessage ?? ''}`.trim());
+  if (!s.success) { console.warn('[x402] settle failed', s.errorReason, s.errorMessage); throw new Error(`Settlement failed: ${s.errorReason ?? ''} ${s.errorMessage ?? ''}`.trim()); }
+  console.log('[x402] settled', s.transaction, 'payer', s.payer);
   return { transactionId: s.transaction, payer: s.payer };
 }
 
