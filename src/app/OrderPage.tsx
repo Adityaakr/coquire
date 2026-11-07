@@ -35,30 +35,27 @@ export function OrderPage() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-      <Bento variant="app" pad={26}>
-        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
-          <div style={{ minWidth: 0 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-              <h1 style={{ fontSize: 26 }}>{order.title}</h1>
-              <StatusBadge status={status} />
-            </div>
-            <p style={{ color: 'var(--text-2)', fontSize: 14, marginTop: 6, maxWidth: 640, lineHeight: 1.5 }}>{order.description}</p>
-            <div style={{ display: 'flex', gap: 8, marginTop: 12, flexWrap: 'wrap' }}>
-              {order.arkivListingId && <Chip>{arkivUrl ? <a href={arkivUrl} target="_blank" rel="noreferrer" style={{ fontFamily: 'var(--font-mono)', color: 'inherit' }}>Arkiv {order.arkivListingId.slice(0, 14)}…</a> : <span style={{ fontFamily: 'var(--font-mono)' }}>listing {order.arkivListingId}</span>}</Chip>}
-              <Chip>{status === 'open' || status === 'quoted' ? <Countdown until={order.offerWindowEnd} prefix="offers close in" /> : `offers closed ${formatDate(order.offerWindowEnd)}`}</Chip>
-              <Chip>needed by {formatDate(order.neededBy)}</Chip>
-            </div>
-          </div>
-          <Link to="/app" style={{ fontSize: 13, color: 'var(--text-2)' }}>← Overview</Link>
+      <div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+          <h1 className="px-h1" style={{ fontSize: 34 }}>{order.title}</h1>
+          <StatusBadge status={status} />
+          <Link to="/app" style={{ marginLeft: 'auto', fontSize: 13.5, color: 'var(--text-2)' }}>← Home</Link>
+        </div>
+        <p className="px-lead" style={{ maxWidth: 720 }}>{order.description}</p>
+        <div className="px-chips">
+          {order.arkivListingId && <span className="px-chip">{arkivUrl ? <a href={arkivUrl} target="_blank" rel="noreferrer" style={{ fontFamily: 'var(--font-mono)', fontSize: 12 }}>Arkiv {order.arkivListingId.slice(0, 12)}…</a> : <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12 }}>listing {order.arkivListingId}</span>}</span>}
+          <span className="px-chip">{status === 'open' || status === 'quoted' ? <Countdown until={order.offerWindowEnd} prefix="offers close in" /> : `offers closed ${formatDate(order.offerWindowEnd)}`}</span>
+          <span className="px-chip">needed by {formatDate(order.neededBy)}</span>
+          <span className="px-chip">1 call = 1 page</span>
         </div>
         <Stepper status={status} />
-        <div className="ap-grid-4" style={{ margin: '22px 0 4px' }}>
-          <Stat label="Combined volume" value={`${totalCalls(order)} pages`} size="sm" sub={`${order.teams.length} ${order.teams.length === 1 ? 'team' : 'teams'} · 1 call = 1 page`} />
-          <Stat label="Quotes" value={order.quotes.length} size="sm" sub={best !== null ? <>best <Money value={best} /> per page</> : 'suppliers are reviewing'} />
-          <Stat label="Approved rate" value={quote ? <Money value={quote.ratePerCall} /> : '—'} size="sm" gradient={!!quote} sub={supplier ? supplier.name : 'group has not approved a quote'} />
-          <Stat label="Settled calls" value={`${settledPayments(state, order.id).length} / ${totalCalls(order)}`} size="sm" mono sub={quote ? <>reservation <Money value={quote.reservationFee} /></> : ' '} />
+        <div className="px-stats">
+          <div><div className="px-stat-l">Combined volume</div><div className="px-stat-v">{totalCalls(order)} pages</div><div className="px-stat-s">{order.teams.length} {order.teams.length === 1 ? 'team' : 'teams'}</div></div>
+          <div><div className="px-stat-l">Quotes</div><div className="px-stat-v">{order.quotes.length}</div><div className="px-stat-s">{best !== null ? <>best <Money value={best} /> per page</> : 'suppliers are reviewing'}</div></div>
+          <div><div className="px-stat-l">Approved rate</div><div className={`px-stat-v${quote ? ' mono' : ''}`}>{quote ? <Money value={quote.ratePerCall} /> : '—'}</div><div className="px-stat-s">{supplier ? supplier.name : 'no quote approved yet'}</div></div>
+          <div><div className="px-stat-l">Settled calls</div><div className="px-stat-v mono">{settledPayments(state, order.id).length} / {totalCalls(order)}</div><div className="px-stat-s">{quote ? <>reservation <Money value={quote.reservationFee} /></> : ' '}</div></div>
         </div>
-      </Bento>
+      </div>
 
       <Tabs<Tab> items={items} active={tab} onChange={setTab} />
       {tab === 'group' && <GroupTab order={order} isMember={isMember} />}

@@ -247,3 +247,25 @@
 .px-btn-primary:hover{filter:brightness(1.08)}
 @media (max-width:1100px){.px-cols{grid-template-columns:1fr;gap:40px}}
 @media (max-width:860px){.ap-body{padding:24px 16px 96px}.px-h1{font-size:30px}.px-amount{font-size:40px}}
+
+/* ───────── flatten every remaining card to the Home style ───────── */
+.ap-root .bento-app{background:#fff;border:1px solid var(--fx-mist);border-radius:20px}
+.ap-root .t-tabs{background:var(--fx-lgb);padding:4px;border-radius:12px;gap:2px}
+.ap-root .t-tab{background:transparent;border-radius:9px;height:34px;padding:0 16px;font-size:14px}
+.ap-root .t-tab[data-on=true]{background:#fff;box-shadow:0 1px 2px rgba(29,29,29,.08)}
+.ap-root .t-card,.ap-root .t-card-wash{background:#fff;border-color:var(--fx-mist)}
+.ap-root .ap-th{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-3);font-weight:600;border-bottom:1px solid var(--fx-mist)}
+.ap-root .ap-row td{border-top:1px solid var(--line-1)}
+.ap-root .ap-row:hover{background:var(--fx-lgb)}
+.ap-root .t-in-b,.ap-root .t-sel select,.ap-root textarea{border-radius:10px}
+.ap-root .t-btn-primary{background:var(--fx-jet)}
+.px-chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.px-chip{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 12px;border:1px solid var(--fx-mist);border-radius:99px;font-size:13px;color:var(--text-2);background:#fff}
+.px-chip a{color:inherit}
+.px-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;margin:28px 0 8px}
+.px-stat-l{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-2);font-weight:600}
+.px-stat-v{font-family:var(--font-display);font-weight:600;font-size:30px;letter-spacing:-0.02em;margin-top:6px;line-height:1.1}
+.px-stat-v.mono{font-family:var(--font-mono);font-size:26px;letter-spacing:-0.01em}
+.px-stat-s{font-size:13.5px;color:var(--text-2);margin-top:4px}
+.ap-root .ap-stepper{margin:26px 0 10px}
+@media (max-width:1100px){.px-stats{grid-template-columns:1fr 1fr}}

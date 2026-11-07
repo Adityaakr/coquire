@@ -22,6 +22,7 @@ export function SettingsPage() {
   ];
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20, maxWidth: 820 }}>
+      <div><h1 className="px-h1">Settings</h1><p className="px-lead">Account, keys, and what is live on this deployment.</p></div>
       <Panel title="Account" aside={<Badge size="sm" tone={usingWallet ? 'accent' : 'neutral'} mono>{usingWallet ? 'wallet' : 'browser key'}</Badge>}>
         <Row k="Signing with" v={ownerAddress ? shortAddr(ownerAddress) : '—'} />
         <Row k="Team" v={a.teamName ?? '—'} />

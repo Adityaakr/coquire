@@ -32,9 +32,8 @@ export function OnboardPage() {
   return (
     <div style={{ maxWidth: 620, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 20 }}>
       <div>
-        <div className="eyebrow">One account, two modes</div>
-        <h1 style={{ fontSize: 32, marginTop: 8 }}>How will you use Coquire first?</h1>
-        <p style={{ color: 'var(--text-2)', marginTop: 8, fontSize: 15, lineHeight: 1.5 }}>One account can buy and supply. Switch modes any time from the top bar.</p>
+        <h1 className="px-h1" style={{ fontSize: 34 }}>How will you use Coquire first?</h1>
+        <p className="px-lead">One account can buy and supply. Switch any time from the sidebar.</p>
       </div>
       <Panel>
         <div style={{ display: 'flex', gap: 10 }}>

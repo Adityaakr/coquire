@@ -35,9 +35,9 @@ export function NewOrderPage() {
   };
 
   return (
-    <div style={{ maxWidth: 720, display: 'flex', flexDirection: 'column', gap: 20 }}>
-      <Panel title="New order">
-        <p style={{ fontSize: 14, color: 'var(--text-2)', lineHeight: 1.6, margin: '-6px 0 18px' }}>Describe the workload and how much of it you need. Other teams join with their own volume; suppliers quote on the total.</p>
+    <div style={{ maxWidth: 760, display: 'flex', flexDirection: 'column', gap: 24 }}>
+      <div><h1 className="px-h1">New order</h1><p className="px-lead">Describe the workload and how much of it you need. Other teams join with their own volume; suppliers quote on the total.</p></div>
+      <Panel>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           <Input label="Title" value={title} onChange={(e) => setTitle(e.target.value)} />
           <div className="t-in">
