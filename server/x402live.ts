@@ -5,7 +5,8 @@
  */
 import type { Micro } from '../src/domain/money.js';
 
-export const LIVE = !!process.env.X402_FACILITATOR_URL;
+/** Live only when both the facilitator and the supplier's Hedera account are configured. */
+export const LIVE = !!process.env.X402_FACILITATOR_URL && !!process.env.SUPPLIER_HEDERA_ACCOUNT_ID;
 export const NETWORK = process.env.X402_NETWORK ?? 'hedera:testnet';
 export const USDC_TOKEN = process.env.HEDERA_USDC_TOKEN_ID ?? '0.0.429274';
 
