@@ -324,12 +324,18 @@ api.post('/orders/:id/release', requireAuth, async (req, res) => {
 });
 
 /* ---------- agent wallet on Hedera testnet ---------- */
+/** Network fee for AccountCreate (~0.74 HBAR on testnet) plus the agent's HBAR float. */
+const CREATE_COST_HBAR = Math.round((0.8 + Number(process.env.AGENT_INITIAL_HBAR ?? '0.2')) * 100) / 100;
 api.get('/wallet', requireAuth, async (req, res) => {
   try {
     const { account } = req as AuthedRequest;
     const agent = account.agentAddress ? await mirrorAccount(account.agentAddress) : null;
     const supplier = FUNDING_ENABLED ? await supplierBalances() : null;
-    json(res, { agent, fundingEnabled: FUNDING_ENABLED, supplierUsdc: supplier?.usdc ?? 0, usdcToken: USDC_TOKEN, hashscan: agent ? hashscanAccount(agent.account) : null });
+    json(res, {
+      agent, fundingEnabled: FUNDING_ENABLED, usdcToken: USDC_TOKEN, hashscan: agent ? hashscanAccount(agent.account) : null,
+      supplierUsdc: supplier?.usdc ?? 0, supplierHbar: supplier?.hbar ?? 0, supplierAccount: supplier?.account ?? null, supplierEvm: supplier?.evmAddress ?? null,
+      createCostHbar: CREATE_COST_HBAR, fundUsdc: Number(process.env.AGENT_FUND_USDC ?? '5'),
+    });
   } catch (e) { fail(res, e); }
 });
 
@@ -340,8 +346,14 @@ api.post('/wallet/fund', requireAuth, async (req, res) => {
     if (!FUNDING_ENABLED) throw Object.assign(new Error('Funding from the supplier account is disabled on this server'), { status: 400 });
     if (!account.agentPublicKey) throw Object.assign(new Error('Agent key not registered'), { status: 400 });
     const txs: { label: string; id: string; url: string }[] = [];
-    const created = await createAgentAccount(account.agentPublicKey, Number(process.env.AGENT_INITIAL_HBAR ?? '1'));
-    if (created.txId) txs.push({ label: `Account ${created.accountId} created with 1 HBAR`, id: created.txId, url: hashscanTx(created.txId) });
+    const float = Number(process.env.AGENT_INITIAL_HBAR ?? '0.2');
+    const existing = await mirrorAccount(account.agentAddress!);
+    if (!existing) {
+      const sup = await supplierBalances();
+      if ((sup?.hbar ?? 0) < CREATE_COST_HBAR) throw Object.assign(new Error(`The supplier treasury holds ${(sup?.hbar ?? 0).toFixed(2)} HBAR; creating your agent account costs about ${CREATE_COST_HBAR} HBAR. Send testnet HBAR to ${sup?.account ?? process.env.SUPPLIER_HEDERA_ACCOUNT_ID} and try again.`), { status: 409 });
+    }
+    const created = await createAgentAccount(account.agentPublicKey, float);
+    if (created.txId) txs.push({ label: `Account ${created.accountId} created with ${float} HBAR`, id: created.txId, url: hashscanTx(created.txId) });
     const want = usdc(process.env.AGENT_FUND_USDC ?? '5');
     const before = await mirrorAccount(created.accountId);
     const sup = await supplierBalances();

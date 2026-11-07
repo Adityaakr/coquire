@@ -7,7 +7,7 @@ import { associateUsdc, USDC_TOKEN_ID } from '@/lib/hedera';
 import { teamBudget } from '@/domain/selectors';
 import { Money } from './kit';
 
-interface WalletInfo { agent: { account: string; evmAddress: string; hbar: number; usdc: number | null; associated: boolean; maxAuto: number } | null; fundingEnabled: boolean; supplierUsdc: number; usdcToken: string; hashscan: string | null }
+interface WalletInfo { agent: { account: string; evmAddress: string; hbar: number; usdc: number | null; associated: boolean; maxAuto: number } | null; fundingEnabled: boolean; supplierUsdc: number; supplierHbar: number; supplierAccount: string | null; supplierEvm: string | null; createCostHbar: number; fundUsdc: number; usdcToken: string; hashscan: string | null }
 interface FundResult { accountId: string; txs: { label: string; id: string; url: string }[]; agent: WalletInfo['agent']; supplierUsdc: number; hashscan: string }
 
 export function WalletPage() {
@@ -21,6 +21,7 @@ export function WalletPage() {
   const a = w?.agent ?? null;
   const usdc = a?.usdc ?? 0;
   const ready = !!a && (a.associated || a.maxAuto !== 0) && usdc > 0;
+  const treasuryLow = !!w?.fundingEnabled && !a && (w.supplierHbar ?? 0) < (w.createCostHbar ?? 1);
   const committed = myTeam ? state.orders.filter((o) => o.teams.some((t) => t.teamId === myTeam.id) && o.status === 'active').reduce((acc, o) => acc + teamBudget(state, o, myTeam.id).remaining, 0n) : 0n;
 
   const fund = async () => {
@@ -44,10 +45,16 @@ export function WalletPage() {
             <div className="px-amount">{usdc.toFixed(2)}<small><TokenIcon token="USDC" size={18} />USDC</small></div>
             <div style={{ display: 'flex', gap: 10 }}>
               <Button size="lg" variant="secondary" onClick={() => void refresh()}><RefreshCw size={15} strokeWidth={1.8} />Refresh</Button>
-              {w?.fundingEnabled && <Button size="lg" className="px-btn-primary" loading={busy === 'fund'} onClick={fund}><Zap size={15} strokeWidth={1.8} />{a ? 'Top up from supplier' : 'Create and fund agent'}</Button>}
+              {w?.fundingEnabled && <Button size="lg" className="px-btn-primary" loading={busy === 'fund'} disabled={treasuryLow} onClick={fund}><Zap size={15} strokeWidth={1.8} />{a ? 'Top up from supplier' : 'Create and fund agent'}</Button>}
             </div>
           </div>
           <div className="px-note"><span className="px-pill"><span className="ap-dot" data-on={live ? 'true' : 'sim'} />Hedera testnet</span><span>{a ? `${a.hbar.toFixed(2)} HBAR on ${a.account}` : 'No agent account yet'}{live ? '. Per-call fees are sponsored by the facilitator.' : '. Settlement is simulated on this server.'}</span></div>
+          {treasuryLow && w && (
+            <div className="px-callout" data-tone="warn">
+              <div className="px-callout-t">Supplier treasury needs HBAR</div>
+              <div>It holds <span className="mono">{w.supplierHbar.toFixed(2)} HBAR</span>; creating your agent account costs about <span className="mono">{w.createCostHbar} HBAR</span>. Send testnet HBAR to <span className="mono">{w.supplierAccount}</span>{w.supplierEvm ? <> (EVM <span className="mono">{w.supplierEvm}</span>)</> : null}, then refresh.</div>
+            </div>
+          )}
           <div className="px-hr" />
           <div className="px-label">Agent account</div>
           <div className="px-list">
@@ -73,8 +80,8 @@ export function WalletPage() {
           <div className="px-label">Fund the agent</div>
           <div className="px-steps">
             {[
-              { t: 'Agent account on Hedera', s: a ? `${a.account}, ${a.hbar.toFixed(2)} HBAR` : 'Created by the supplier account with 1 HBAR and automatic token associations.', done: !!a },
-              { t: 'USDC on the agent', s: a && usdc > 0 ? `${usdc.toFixed(2)} USDC` : w?.fundingEnabled ? `Sent from the supplier's balance (${(w.supplierUsdc ?? 0).toFixed(2)} USDC available).` : 'Send testnet USDC to the agent address.', done: usdc > 0 },
+              { t: 'Agent account on Hedera', s: a ? `${a.account}, ${a.hbar.toFixed(2)} HBAR` : 'Created on chain by the supplier account, with a small HBAR float and automatic token associations.', done: !!a },
+              { t: 'USDC on the agent', s: a && usdc > 0 ? `${usdc.toFixed(2)} USDC` : w?.fundingEnabled ? `${w.fundUsdc} USDC sent from the supplier's balance (${(w.supplierUsdc ?? 0).toFixed(2)} USDC available).` : 'Send testnet USDC to the agent address.', done: usdc > 0 },
               { t: 'Ready to pay per call', s: 'The x402 facilitator sponsors the network fee. Each settled call gets a HashScan receipt.', done: ready },
             ].map((s) => (
               <div key={s.t} className="px-step" data-done={s.done}><span className="px-step-ic">{s.done && <Check size={14} strokeWidth={3} />}</span><div><div className="px-step-t">{s.t}</div><div className="px-step-s">{s.s}</div></div></div>
