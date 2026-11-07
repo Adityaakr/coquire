@@ -7,16 +7,16 @@ const FX = '/fx/';
 
 /* ---------- logos: real marks where a public icon exists, typographic wordmarks otherwise ---------- */
 type LogoName = 'hedera' | 'x402' | 'usdc' | 'arkiv' | 'ccip' | 'sepolia' | 'metamask' | 'tesseract' | 'ecies' | 'sqlite' | 'express';
-const LOGOS: Record<LogoName, { label: string; img?: string; mark?: string; c?: 'blue' | 'green' | 'orange' }> = {
+const LOGOS: Record<LogoName, { label: string; img?: string; word?: boolean; mark?: string; c?: 'blue' | 'green' | 'orange' }> = {
   hedera: { label: 'Hedera', img: '/logos/hedera.svg' },
-  x402: { label: 'x402', mark: '402', c: 'blue' },
+  x402: { label: 'x402', img: '/logos/x402.svg', word: true },
   usdc: { label: 'USDC', img: '/logos/circle.svg' },
-  arkiv: { label: 'Arkiv', mark: 'A', c: 'green' },
+  arkiv: { label: 'Arkiv', img: '/logos/arkiv.svg' },
   ccip: { label: 'Chainlink CCIP', img: '/logos/chainlink.svg' },
   sepolia: { label: 'Ethereum Sepolia', img: '/logos/ethereum.svg' },
-  metamask: { label: 'MetaMask', mark: 'M', c: 'orange' },
-  tesseract: { label: 'tesseract.js', mark: 'T' },
-  ecies: { label: 'ECIES', mark: 'E' },
+  metamask: { label: 'MetaMask', img: '/logos/metamask.svg' },
+  tesseract: { label: 'tesseract.js', img: '/logos/tesseract.png' },
+  ecies: { label: 'ECIES', img: '/logos/ecies.svg' },
   sqlite: { label: 'SQLite', img: '/logos/sqlite.svg' },
   express: { label: 'Express', img: '/logos/express.svg' },
 };
@@ -24,8 +24,8 @@ export function Logo({ name, lg }: { name: LogoName; lg?: boolean }) {
   const l = LOGOS[name];
   return (
     <span className={`cq-logo${lg ? ' cq-logo-lg' : ''}`}>
-      {l.img ? <img src={l.img} alt="" /> : <span className="cq-logo-mark" data-c={l.c}>{l.mark}</span>}
-      {l.label}
+      {l.word ? <img className="cq-logo-word" src={l.img} alt={l.label} /> : l.img ? <img src={l.img} alt="" /> : <span className="cq-logo-mark" data-c={l.c}>{l.mark}</span>}
+      {!l.word && l.label}
     </span>
   );
 }

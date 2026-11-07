@@ -570,13 +570,15 @@
 
 /* ───────── Coquire sections: use cases, how it works, built on, privacy ───────── */
 .cq-logo{display:inline-flex;align-items:center;gap:7px;color:var(--fx-jet);font-family:var(--font-display);font-weight:600;font-size:15px;letter-spacing:-0.01em;white-space:nowrap}
-.cq-logo img{width:18px;height:18px;display:block}
+.cq-logo img{width:18px;height:18px;display:block;object-fit:contain}
+.cq-logo img.cq-logo-word{width:auto;height:15px}
 .cq-logo-mark{width:18px;height:18px;border-radius:5px;background:var(--fx-jet);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:9px;font-weight:700}
 .cq-logo-mark[data-c=blue]{background:var(--fx-indigo)}
 .cq-logo-mark[data-c=green]{background:#10B981}
 .cq-logo-mark[data-c=orange]{background:#FF8B06}
 .cq-logo-lg{font-size:22px;gap:10px}
 .cq-logo-lg img,.cq-logo-lg .cq-logo-mark{width:28px;height:28px;border-radius:8px;font-size:12px}
+.cq-logo-lg img.cq-logo-word{width:auto;height:24px;border-radius:0}
 .cq-by{display:flex;align-items:center;gap:14px;flex-wrap:wrap;color:var(--fx-silver);font-size:14px}
 .cq-by .cq-logo{font-size:14px}
 
